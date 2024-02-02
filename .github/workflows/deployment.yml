@@ -1,0 +1,38 @@
+name: Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Configure AWS CLI
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }} --debug
+          aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }} --debug
+          aws configure set region us-east-2
+
+      - name: Zip Application Files
+        run: |
+          cd $GITHUB_WORKSPACE
+          zip -r weather.zip application.py tasks.py appspec.yml requirements.txt
+
+      - name: Upload to S3 Bucket
+        run: |
+          aws s3 cp weather.zip s3://elasticbeanstalk-us-east-2-780026431059/
+
+      - name: Deploy to AWS Elastic Beanstalk
+        run: |
+          aws elasticbeanstalk create-application-version --application-name weather-vis --version-label cleanup1.1 --source-bundle S3Bucket=elasticbeanstalk-us-east-2-780026431059,S3Key=weather.zip --debug
+          aws elasticbeanstalk update-environment --environment-name Weather-vis-env-2 --version-label cleanup1.1 --debug

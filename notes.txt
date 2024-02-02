@@ -1,0 +1,11 @@
+**Future To-Dos**
+
+Deployment:
+[] Amend .github/workflow/deployment.yml to only be triggered when changes were made to relevant files / ignore changes to other files
+
+Lambda/S3:
+[] Save down latest [3] forecast.csv files in S3, e.g. overwrite and rotate forecast-latest.csv, forecast-H1.csv, forecast-H2.csv
+
+App Functionality:
+[] Prevent graph shifts based on min/max of cities not shown. Idea: calculate min/max based on cities selected (callback)
+[] Show latest [3] forecasts in plotly, make older forecasts more opaque
